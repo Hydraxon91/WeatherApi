@@ -34,7 +34,7 @@ public class Tests
         _jsonProcessorMock.Setup(x => x.Process(weatherData)).Returns(expectedForecast);
 
         // Act
-        var result = await _controller.GetCurrent();
+        var result = await _controller.GetCurrent(null);
 
         // Assert
         Assert.IsInstanceOf(typeof(OkObjectResult), result.Result);
