@@ -16,6 +16,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IWeatherDataProvider, OpenWeatherMapApi>();
 builder.Services.AddSingleton<IJsonProcessor, JsonProcessor>();
+builder.Services.AddSingleton<ICityRepository, CityRepository>();
 
 var app = builder.Build();
 

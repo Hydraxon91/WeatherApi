@@ -19,13 +19,15 @@ public class WeatherForecastController : ControllerBase
     private readonly ILogger<WeatherForecastController> _logger;
     private readonly IWeatherDataProvider _weatherDataProvider;
     private readonly IJsonProcessor _jsonProcessor;
+    private readonly ICityRepository _cityRepository;
 
     public WeatherForecastController(ILogger<WeatherForecastController> logger, IWeatherDataProvider weatherDataProvider,
-        IJsonProcessor jsonProcessor)
+        IJsonProcessor jsonProcessor, ICityRepository cityRepository)
     {
         _logger = logger;
         _weatherDataProvider = weatherDataProvider;
         _jsonProcessor = jsonProcessor;
+        _cityRepository = cityRepository;
     }
 
     // [HttpGet("GetWeatherForecast")]
@@ -185,8 +187,9 @@ public class WeatherForecastController : ControllerBase
     [HttpGet("GetCurrent")]
     public async Task<ActionResult<WeatherForecast>> GetCurrent(string cityName)
     {
-        await using var dbContext = new WeatherApiContext();
-        var city = dbContext.Cities.FirstOrDefault(c => c.Name == cityName);
+        // await using var dbContext = new WeatherApiContext();
+        // var city = dbContext.Cities.FirstOrDefault(c => c.Name == cityName);
+        var city = _cityRepository.GetByName(cityName);
         if (city == null) return NotFound($"City {cityName} is not in the DB");
 
         try
