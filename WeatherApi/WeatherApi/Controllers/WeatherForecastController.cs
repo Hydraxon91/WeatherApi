@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using WeatherApi.Context;
 using WeatherApi.Service;
 
 namespace WeatherApi.Controllers;
@@ -160,19 +161,40 @@ public class WeatherForecastController : ControllerBase
             .ToArray();
     }
     
-    [HttpGet("GetCurrent")]
-    public async Task<ActionResult<WeatherForecast>> GetCurrent()
-    {
-        //Budapest lat & lon
-        var lat = 47.497913;
-        var lon = 19.040236;
+    // [HttpGet("GetCurrent")]
+    // public async Task<ActionResult<WeatherForecast>> GetCurrent()
+    // {
+    //     //Budapest lat & lon
+    //     var lat = 47.497913;
+    //     var lon = 19.040236;
+    //
+    //     try
+    //     {
+    //         var weatherData = await _weatherDataProvider.GetCurrentAsync(lat, lon);
+    //         return Ok(_jsonProcessor.Process(weatherData));
+    //     }
+    //     catch (Exception e )
+    //     {
+    //         _logger.LogError(e, "Error getting weather data");
+    //         return NotFound("Error getting weather data");
+    //     }
+    // }
     
+    //Entity framework
+
+    [HttpGet("GetCurrent")]
+    public async Task<ActionResult<WeatherForecast>> GetCurrent(string cityName)
+    {
+        await using var dbContext = new WeatherApiContext();
+        var city = dbContext.Cities.FirstOrDefault(c => c.Name == cityName);
+        if (city == null) return NotFound($"City {cityName} is not in the DB");
+
         try
         {
-            var weatherData = await _weatherDataProvider.GetCurrentAsync(lat, lon);
+            var weatherData = await _weatherDataProvider.GetCurrentAsync(city.Longitude, city.Latitude);
             return Ok(_jsonProcessor.Process(weatherData));
         }
-        catch (Exception e )
+        catch (Exception e)
         {
             _logger.LogError(e, "Error getting weather data");
             return NotFound("Error getting weather data");
